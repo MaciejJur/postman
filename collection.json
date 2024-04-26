@@ -1,0 +1,293 @@
+{
+	"info": {
+		"_postman_id": "b4e0b662-c68b-45bd-9bb6-da975d21d9bd",
+		"name": "Restful booker",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18620156"
+	},
+	"item": [
+		{
+			"name": "POSITIVE SCENARIOs",
+			"item": [
+				{
+					"name": "Auth-Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseData = pm.response.json();              //pobiera cały obiekt i tworzy zmienna\r",
+									"console.log(\">>response: \", responseData);\r",
+									"\r",
+									"let authToken = responseData.token;\r",
+									"console.log(\"authToken: \", authToken);\r",
+									"\r",
+									"pm.environment.set(\"token\", authToken);\r",
+									"\r",
+									"pm.test(\"status code equals to 200\", function () {\r",
+									"    pm.expect(pm.response.code, \"Response code should be equal to 200\").to.eql(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\" : \"{{username}}\",\n    \"password\" : \"{{password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/auth",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"auth"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateBooking",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const firstname = pm.iterationData.get(\"firstname\");\r",
+									"console.log(\">> data from csv: firstname\", firstname)\r",
+									"\r",
+									"if (firstname)   // sprawdza czy istnieje \r",
+									"    {   pm.environment.set(\"firstName\", firstname);     }\r",
+									"\r",
+									"else            //jak nie to wygeneruj losową wartość i podmień pod atrybut\r",
+									"    {   let firstname = pm.variables.replaceIn('{{$randomFirstName}}')\r",
+									"        pm.environment.set(\"firstName\", firstname);     }\r",
+									"\r",
+									"\r",
+									"const lastname = pm.iterationData.get(\"lastname\");\r",
+									"console.log(\">> data from csv: lastname\", lastname)\r",
+									"pm.environment.set(\"lastName\", lastname);\r",
+									"\r",
+									"const totalprice = pm.iterationData.get(\"totalprice\");\r",
+									"console.log(\">> data from csv: totalprice\", totalprice)\r",
+									"pm.environment.set(\"totalPrice\", totalprice);\r",
+									"\r",
+									"const depositpaid = pm.iterationData.get(\"depositpaid\");\r",
+									"console.log(\">> data from csv: depositpaid\", depositpaid)\r",
+									"pm.environment.set(\"depositPaid\", depositpaid);\r",
+									"\r",
+									"const checkin = pm.iterationData.get(\"checkin\");\r",
+									"console.log(\">> data from csv: checkin\", checkin)\r",
+									"pm.environment.set(\"checkIn\", checkin);\r",
+									"\r",
+									"const checkout = pm.iterationData.get(\"checkout\");\r",
+									"console.log(\">> data from csv: checkout\", checkout)\r",
+									"pm.environment.set(\"checkOut\", checkout);\r",
+									"\r",
+									"const additionalneeds = pm.iterationData.get(\"additionalneeds\");\r",
+									"console.log(\">> data from csv: additionalneeds\", additionalneeds)\r",
+									"pm.environment.set(\"additionalNeeds\", additionalneeds);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseData = pm.response.json();\r",
+									"\r",
+									"let bookingId = responseData.bookingid;\r",
+									"console.log(\"bookingId: \", bookingId);\r",
+									"\r",
+									"pm.environment.set(\"bookingId\", bookingId);\r",
+									"\r",
+									"\r",
+									"console.log(typeof pm.response.json())\r",
+									"pm.test(\"Object\", function () {\r",
+									"    pm.expect(pm.response.json(), \"Response should be object\").to.be.an('object');\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"status code equals to 200\", function () {\r",
+									"    pm.expect(pm.response.code, \"Response code should be equal to 200\").to.eql(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									"\r",
+									"pm.test(\"1.Response type is objec\", function () {\r",
+									"    pm.expect(responseData.booking.firstname, \"firstname should be a string\").to.be.an('string');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"2.Response type is objec\", function () {\r",
+									"    pm.expect(responseData.booking.lastname, \"lastname should be a string\").to.be.an('string');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"3.Response type is objec\", function () {\r",
+									"    pm.expect(responseData.booking.totalprice, \"totalprice should be a number\").to.be.an('number');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"4.Response type is objec\", function () {\r",
+									"    pm.expect(responseData.booking.additionalneeds, \"additionalneeds should be a string\").to.be.an('string');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"5.Response type is objec\", function () {\r",
+									"    pm.expect(responseData.booking.bookingdates.checkin, \"checkin should be a string\").to.be.an('string');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"6.Response type is objec\", function () {\r",
+									"    pm.expect(responseData.booking.bookingdates.checkout, \"checkout should be a string\").to.be.an('string');\r",
+									"});\r",
+									"\r",
+									"\r",
+									"let firstname = responseData.booking.firstname;\r",
+									"pm.environment.set(\"firstname\", firstname);\r",
+									"let totalprice = responseData.booking.totalprice;\r",
+									"pm.environment.set(\"totalprice\", totalprice);\r",
+									"\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstname\": \"{{firstName}}\",\n    \"lastname\": \"{{lastName}}\",\n    \"totalprice\": {{totalPrice}},\n    \"depositpaid\": {{depositPaid}},\n    \"bookingdates\": {\n        \"checkin\": \"{{checkIn}}\",\n        \"checkout\": \"{{checkOut}}\"\n    },\n    \"additionalneeds\": \"{{additionalNeeds}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/booking",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"booking"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetBooking - by Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseData = pm.response.json();              //pobiera cały obiekt i tworzy zmienną\r",
+									"\r",
+									"\r",
+									"pm.test(\"status code equals to 200\", function () {\r",
+									"    pm.expect(pm.response.code, \"Response code should be equal to 200\").to.eql(200);    //nie moge użyc responseData - bo tam nie ma kodu\r",
+									"});\r",
+									"\r",
+									"pm.test(\"2.Check first name\", function () {\r",
+									"    pm.expect(responseData.firstname, \"Shoudl be correc\").to.eql(pm.environment.get(\"firstname\"));\r",
+									"});     //żeby porównać wartość muszę ją pobrać GET z zmiennej środowiskowej\r",
+									"\r",
+									"pm.test(\"3.Check totalprice\", function () {\r",
+									"    pm.expect(responseData.totalprice, \"Should be correct\").to.eql(pm.environment.get(\"totalprice\"));\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/booking/{{bookingId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"booking",
+								"{{bookingId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetBookingIds - All",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"1.Status code equals to 200\", function () {\r",
+									"    pm.expect(pm.response.code, \"Response code should be equal to 200\").to.eql(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"2.Exist already created booking with proper id\", function () {\r",
+									"    pm.expect(pm.response.text()).to.contains(pm.environment.get(\"bookingId\"));\r",
+									"}); // przeszukuje w tekście\r",
+									"\r",
+									"//console.log(pm.response.json()[0])\r",
+									"//console.log(pm.response.text())     //zamienia na tekst\r",
+									"\r",
+									"\r",
+									"pm.test(\"3.Exist already created booking with proper id\", function () {\r",
+									"    let responseData = pm.response.json();\r",
+									"    let bookingId = pm.environment.get(\"bookingId\");\r",
+									"    pm.expect(responseData).to.deep.include({ bookingid: bookingId });\r",
+									"    // poszukuje takiego elementu\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/booking",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"booking"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
